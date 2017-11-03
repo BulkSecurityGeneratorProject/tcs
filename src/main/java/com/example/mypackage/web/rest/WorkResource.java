@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +23,7 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * REST controller for managing Work.
@@ -125,5 +125,70 @@ public class WorkResource {
         log.debug("REST request to delete Work : {}", id);
         workRepository.delete(id);
         return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+    }
+
+    /**
+     * GET  /works : get all the works.
+     *
+     * @param id
+     * @return the ResponseEntity with status 200 (OK) and the list of works in body
+     */
+    @GetMapping("/works/stats/{employeeId}")
+    @Timed
+    public Map<MonthDefinition, Float> getWorkStats(@PathVariable Long id) {
+        List<Work> allWork = workRepository.findAll();
+
+        Map<MonthDefinition, Float> monthMap = new HashMap<>();
+
+        for (Work work : allWork) {
+            if (work.getEmployee().getId()==id) {
+                int monthValue = work.getDate().getMonthValue();
+                int year = work.getDate().getYear();
+                MonthDefinition monthDefinition = new MonthDefinition(monthValue, year);
+                Float aFloat = monthMap.get(monthDefinition);
+                if(aFloat == null){
+                    Float aFloat1 = new Float(work.getHours());
+                    monthMap.put(monthDefinition, aFloat1);
+                }else{
+                    aFloat = aFloat + work.getHours();
+                    monthMap.put(monthDefinition, aFloat);
+                }
+            }
+        }
+
+        return monthMap;
+    }
+
+    private static class MonthDefinition{
+        public int month;
+        public int year;
+        public MonthDefinition(int month, int year){
+            this.month = month;
+            this.year = year           ;
+        }
+        //Setter getter
+        public void setMonth(int month){
+            this.month=month;
+        }
+        public void setYear(int year){
+            this.year=year;
+        }
+        public int getMonth (){
+            return this.month;
+        }
+        public int getYear (){
+            return this.year;
+        }
+
+        public boolean equals(Object o){
+            //Really bad impl
+            MonthDefinition other = (MonthDefinition) o;
+            return this.month == other.month && this.year == other.year;
+        }
+
+        public int hashCode(){
+            //Very bad impl
+            return month*12314+year;
+        }
     }
 }
