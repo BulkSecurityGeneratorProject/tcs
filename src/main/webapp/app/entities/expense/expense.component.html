@@ -1,0 +1,70 @@
+<div>
+    <h2>
+        <span>Expenses</span>
+        <button class="btn btn-primary float-right jh-create-entity create-expense" [routerLink]="['/', { outlets: { popup: ['expense-new'] } }]">
+            <span class="fa fa-plus"></span>
+            <span >
+            Create new Expense
+            </span>
+        </button>
+    </h2>
+    <jhi-alert></jhi-alert>
+    <div class="row">
+    </div>
+    <br/>
+    <div class="table-responsive" *ngIf="expenses">
+        <table class="table table-striped">
+            <thead>
+            <tr jhiSort [(predicate)]="predicate" [(ascending)]="reverse" [callback]="reset.bind(this)">
+            <th jhiSortBy="id"><span>ID</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="date"><span>Date</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="amount"><span>Amount</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="project.name"><span>Project</span> <span class="fa fa-sort"></span></th>
+            <th jhiSortBy="employee.name"><span>Employee</span> <span class="fa fa-sort"></span></th>
+            <th></th>
+            </tr>
+            </thead>
+            <tbody infinite-scroll (scrolled)="loadPage(page + 1)" [infiniteScrollDisabled]="page >= links['last']" [infiniteScrollDistance]="0">
+            <tr *ngFor="let expense of expenses ;trackBy: trackId">
+                <td><a [routerLink]="['../expense', expense.id ]">{{expense.id}}</a></td>
+                <td>{{expense.date | date:'mediumDate'}}</td>
+                <td>{{expense.amount}}</td>
+                <td>
+                    <div *ngIf="expense.project">
+                        <a [routerLink]="['../project', expense.project?.id ]" >{{expense.project?.name}}</a>
+                    </div>
+                </td>
+                <td>
+                    <div *ngIf="expense.employee">
+                        <a [routerLink]="['../employee', expense.employee?.id ]" >{{expense.employee?.name}}</a>
+                    </div>
+                </td>
+                <td class="text-right">
+                    <div class="btn-group flex-btn-group-container">
+                        <button type="submit"
+                                [routerLink]="['../expense', expense.id ]"
+                                class="btn btn-info btn-sm">
+                            <span class="fa fa-eye"></span>
+                            <span class="d-none d-md-inline">View</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'expense/'+ expense.id + '/edit'} }]"
+                                replaceUrl="true"
+                                class="btn btn-primary btn-sm">
+                            <span class="fa fa-pencil"></span>
+                            <span class="d-none d-md-inline">Edit</span>
+                        </button>
+                        <button type="submit"
+                                [routerLink]="['/', { outlets: { popup: 'expense/'+ expense.id + '/delete'} }]"
+                                replaceUrl="true"
+                                class="btn btn-danger btn-sm">
+                            <span class="fa fa-remove"></span>
+                            <span class="d-none d-md-inline">Delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

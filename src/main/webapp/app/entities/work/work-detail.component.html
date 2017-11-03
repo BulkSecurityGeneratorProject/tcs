@@ -1,0 +1,41 @@
+
+<div *ngIf="work">
+    <h2><span>Work</span> {{work.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="row-md jh-entity-details">
+        <dt><span>Date</span></dt>
+        <dd>
+            <span>{{work.date | date:'mediumDate'}}</span>
+        </dd>
+        <dt><span>Hours</span></dt>
+        <dd>
+            <span>{{work.hours}}</span>
+        </dd>
+        <dt><span>Project</span></dt>
+        <dd>
+            <div *ngIf="work.project">
+                <a [routerLink]="['/project', work.project?.id]">{{work.project?.name}}</a>
+            </div>
+        </dd>
+        <dt><span>Employee</span></dt>
+        <dd>
+            <div *ngIf="work.employee">
+                <a [routerLink]="['/employee', work.employee?.id]">{{work.employee?.name}}</a>
+            </div>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            (click)="previousState()"
+            class="btn btn-info">
+        <span class="fa fa-arrow-left"></span>&nbsp;<span> Back</span>
+    </button>
+
+    <button type="button"
+            [routerLink]="['/', { outlets: { popup: 'work/'+ work.id + '/edit'} }]"
+            replaceUrl="true"
+            class="btn btn-primary">
+        <span class="fa fa-pencil"></span>&nbsp;<span> Edit</span>
+    </button>
+</div>
